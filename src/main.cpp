@@ -5,6 +5,9 @@
 #include "Hardware.h"
 #include "MqttClient.h"
 
+Hardware hardware;
+MQTTClient mqtt;
+
 Ticker sysUpdate;
 bool updateInProgress{false};
 char uid[16];
@@ -39,7 +42,7 @@ void setup() {
 
   // Setup buttons & relays, restore state
   // Puts device into update mode (no MQTT) if first button is held
-  Hardware.setup(updateInProgress);
+  hardware.setup(updateInProgress);
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
   #if ENABLE_LED
@@ -62,7 +65,7 @@ void setup() {
   ArduinoOTA.onStart([]() {
     LOG_LN("OTA update initiated...");
 
-    MQTTClient.disconnect();
+    mqtt.disconnect();
     updateInProgress = true;
   });
 
@@ -105,13 +108,13 @@ void setup() {
 
   if (!updateInProgress) {
     // Set callback to run when mqtt command received
-    MQTTClient.setCommandCallback([](size_t ch, bool state) {
-      Hardware.setState(ch, state);
+    mqtt.setCommandCallback([](size_t ch, bool state) {
+      hardware.setState(ch, state);
     });
 
     // Update system info every 10 seconds
     sysUpdate.attach(10, []() {
-      MQTTClient.sendSys();
+      mqtt.sendSys();
     });
   }
 }
@@ -129,8 +132,8 @@ void loop() {
   if (updateInProgress) return; // Disable mqtt handling during update
 
   // (Re)connect to mqtt
-  if (!MQTTClient.connected()) {
-    if (!MQTTClient.connect(uid)) {
+  if (!mqtt.connected()) {
+    if (!mqtt.connect(uid)) {
       #if ENABLE_LED
         startBlinking();
       #endif
@@ -144,16 +147,16 @@ void loop() {
 
     // Send discovery info & current state on (re)connection
     for (size_t ch{0}; ch < CHANNELS; ch++) {
-      MQTTClient.sendDiscovery(ch, uid);
-      MQTTClient.sendState(ch, Hardware.getState(ch));
+      mqtt.sendDiscovery(ch, uid);
+      mqtt.sendState(ch, hardware.getState(ch));
     }
   }
 
-  MQTTClient.loop();
+  mqtt.loop();
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
-    if (Hardware.stateHasChanged(ch)) {
-      MQTTClient.sendState(ch, Hardware.getState(ch));
+    if (hardware.stateHasChanged(ch)) {
+      mqtt.sendState(ch, hardware.getState(ch));
     }
   }
 }
