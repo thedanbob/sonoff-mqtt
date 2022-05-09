@@ -109,8 +109,8 @@ void setup() {
       Hardware.setState(ch, state);
     });
 
-    // Update system info every 5 seconds
-    sysUpdate.attach(5, []() {
+    // Update system info every 10 seconds
+    sysUpdate.attach(10, []() {
       MQTTClient.sendSys();
     });
   }
