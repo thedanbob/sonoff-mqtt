@@ -1,12 +1,12 @@
-#ifndef HARDWARE_H
-#define HARDWARE_H
+#ifndef RELAY_H
+#define RELAY_H
 
 #include <Ticker.h>
 #include "config.h"
 
-class Hardware {
+class Relay {
   public:
-    Hardware();
+    Relay();
     void setup(bool &updateMode);
     bool getState(size_t ch);
     void setState(size_t ch, bool on, bool write = true);

@@ -2,10 +2,10 @@
 #include <ESP8266WiFi.h>
 #include <Ticker.h>
 #include "config.h"
-#include "Hardware.h"
+#include "Relay.h"
 #include "MqttClient.h"
 
-Hardware hardware;
+Relay relay;
 MQTTClient mqtt;
 
 Ticker sysUpdate;
@@ -42,7 +42,7 @@ void setup() {
 
   // Setup buttons & relays, restore state
   // Puts device into update mode (no MQTT) if first button is held
-  hardware.setup(updateInProgress);
+  relay.setup(updateInProgress);
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
   #if ENABLE_LED
@@ -109,7 +109,7 @@ void setup() {
   if (!updateInProgress) {
     // Set callback to run when mqtt command received
     mqtt.setCommandCallback([](size_t ch, bool state) {
-      hardware.setState(ch, state);
+      relay.setState(ch, state);
     });
 
     // Update system info every 10 seconds
@@ -148,15 +148,15 @@ void loop() {
     // Send discovery info & current state on (re)connection
     for (size_t ch{0}; ch < CHANNELS; ch++) {
       mqtt.sendDiscovery(ch, uid);
-      mqtt.sendState(ch, hardware.getState(ch));
+      mqtt.sendState(ch, relay.getState(ch));
     }
   }
 
   mqtt.loop();
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
-    if (hardware.stateHasChanged(ch)) {
-      mqtt.sendState(ch, hardware.getState(ch));
+    if (relay.stateHasChanged(ch)) {
+      mqtt.sendState(ch, relay.getState(ch));
     }
   }
 }

@@ -1,17 +1,17 @@
 #include <EEPROM.h>
-#include "Hardware.h"
+#include "Relay.h"
 
-const size_t Hardware::_buttonPin[]{BUTTONS};
-const size_t Hardware::_relayPin[]{RELAYS};
-const bool Hardware::_restoreState[]{RESTORE_STATES};
+const size_t Relay::_buttonPin[]{BUTTONS};
+const size_t Relay::_relayPin[]{RELAYS};
+const bool Relay::_restoreState[]{RESTORE_STATES};
 
-Hardware::Hardware() :
+Relay::Relay() :
   _lastState{SLICE(false, false, false, false)},
   _btnCount{SLICE(0, 0, 0, 0)},
   _btnTimer{SLICE(Ticker{}, Ticker{}, Ticker{}, Ticker{})}
 {}
 
-void Hardware::setup(bool &updateMode) {
+void Relay::setup(bool &updateMode) {
   EEPROM.begin(CHANNELS);
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
@@ -42,11 +42,11 @@ void Hardware::setup(bool &updateMode) {
   }
 }
 
-bool Hardware::getState(size_t ch) {
+bool Relay::getState(size_t ch) {
   return digitalRead(_relayPin[ch]);
 }
 
-void Hardware::setState(size_t ch, bool on, bool write) {
+void Relay::setState(size_t ch, bool on, bool write) {
   digitalWrite(_relayPin[ch], on);
 
   if (_restoreState[ch] && write) {
@@ -55,7 +55,7 @@ void Hardware::setState(size_t ch, bool on, bool write) {
   }
 }
 
-bool Hardware::stateHasChanged(size_t ch) {
+bool Relay::stateHasChanged(size_t ch) {
   bool newState = getState(ch);
   if (_lastState[ch] != newState) {
     _lastState[ch] = newState;
