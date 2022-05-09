@@ -17,8 +17,8 @@ void Relay::setup(bool &updateMode) {
   for (size_t ch{0}; ch < CHANNELS; ch++) {
     // Initialize relays
     pinMode(_relayPin[ch], OUTPUT);
-    setState(ch, _restoreState[ch] ? EEPROM.read(ch) : LOW, false);
-    _lastState[ch] = getState(ch);
+    set(ch, _restoreState[ch] ? EEPROM.read(ch) : LOW, false);
+    _lastState[ch] = get(ch);
 
     // Initialize buttons
     pinMode(_buttonPin[ch], INPUT);
@@ -34,7 +34,7 @@ void Relay::setup(bool &updateMode) {
         _btnCount[ch]++;
       } else {
         if (_btnCount[ch] > 1) {
-          setState(ch, !getState(ch)); // Toggle relay
+          set(ch, !get(ch)); // Toggle relay
           _btnCount[ch] = 0;
         }
       }
@@ -42,11 +42,11 @@ void Relay::setup(bool &updateMode) {
   }
 }
 
-bool Relay::getState(size_t ch) {
+bool Relay::get(size_t ch) {
   return digitalRead(_relayPin[ch]);
 }
 
-void Relay::setState(size_t ch, bool on, bool write) {
+void Relay::set(size_t ch, bool on, bool write) {
   digitalWrite(_relayPin[ch], on);
 
   if (_restoreState[ch] && write) {
@@ -55,8 +55,8 @@ void Relay::setState(size_t ch, bool on, bool write) {
   }
 }
 
-bool Relay::stateHasChanged(size_t ch) {
-  bool newState = getState(ch);
+bool Relay::hasChanged(size_t ch) {
+  bool newState = get(ch);
   if (_lastState[ch] != newState) {
     _lastState[ch] = newState;
     return true;

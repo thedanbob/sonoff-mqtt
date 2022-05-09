@@ -8,9 +8,9 @@ class Relay {
   public:
     Relay();
     void setup(bool &updateMode);
-    bool getState(size_t ch);
-    void setState(size_t ch, bool on, bool write = true);
-    bool stateHasChanged(size_t ch);
+    bool get(size_t ch);
+    void set(size_t ch, bool on, bool write = true);
+    bool hasChanged(size_t ch);
 
   private:
     static const size_t _buttonPin[CHANNELS];
