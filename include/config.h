@@ -20,12 +20,13 @@
 //#define CHANNELS                        // Number of channels: 1 for Basic Sonoff or 1-4 for 4CH
 //#define ENABLE_LED true                 // Enable the status LED
 
-// Friendly name(s) for device discovery
-// Note: blank by default to save memory
+// Friendly name(s) for MQTT discovery (blank by default to save memory)
 //#define NAME_1 "Sonoff light 1"
 //#define NAME_2 "Sonoff light 2"
 //#define NAME_3 "Sonoff light 3"
 //#define NAME_4 "Sonoff light 4"
+
+//#define DEVICE_NAME "My Sonoff Basic"      // Device name for MQTT discovery
 
 // Restore relay states after power loss. If set to false, relay will be off when power is restored.
 // 2-4 only apply to Sonoff 4CH.
@@ -139,6 +140,18 @@
 #define RELAYS SLICE(12, 5, 4, 15)
 #define RESTORE_STATES SLICE(RESTORE_STATE_1, RESTORE_STATE_2, RESTORE_STATE_3, RESTORE_STATE_4)
 #define NAMES SLICE(NAME_1, NAME_2, NAME_3, NAME_4)
+
+#ifndef DEVICE_MODEL
+  #if CHANNELS == 1
+    #define DEVICE_MODEL "Sonoff Basic"
+  #else
+    #define DEVICE_MODEL "Sonoff 4CH"
+  #endif
+#endif
+
+#ifndef DEVICE_NAME
+  #define DEVICE_NAME DEVICE_MODEL
+#endif
 
 #define MQTT_CMD_SUF "/cmd"
 #define MQTT_STATE_SUF "/stat"

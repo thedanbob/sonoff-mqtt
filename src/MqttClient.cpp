@@ -88,7 +88,6 @@ void MQTTClient::sendState(size_t ch, bool state) {
 
 void MQTTClient::sendSys() {
   String payload{"{"
-    "\"Build\":\"" VERSION "\","
     "\"IP\":\"" + WiFi.localIP().toString() + "\","
     "\"RSSI\":" + String{WiFi.RSSI()} + ","
     "\"FreeMem\":" + String{ESP.getFreeHeap()} +
@@ -119,7 +118,15 @@ void MQTTClient::sendDiscovery(size_t ch, String uid) {
     #ifndef MQTT_MSG_DOWN_DEFAULT
     "\"pl_not_avail\":\"" MQTT_MSG_DOWN "\","
     #endif
-    "\"qos\":" STR(MQTT_QOS)
+    "\"qos\":" STR(MQTT_QOS) ","
+        "\"dev\":{"
+      "\"name\":\"" DEVICE_NAME "\","
+      "\"mf\":\"ITEAD\","
+      "\"mdl\":\"" DEVICE_MODEL "\","
+      "\"ids\":[\"" + ESP.getChipId() + "\"],"
+      "\"cns\":[[\"mac\",\"" + WiFi.macAddress() + "\"]],"
+      "\"sw\":\"" VERSION "\""
+    "}"
   "}"};
 
   _pubSubClient.publish(
